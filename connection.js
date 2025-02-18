@@ -1,37 +1,18 @@
-https://fork-quick-parcel.glitch.me
-
 require('dotenv').config();
 const { MongoClient } = require('mongodb');
 
-async function main(callback) {
-    const URI = process.env.MONGO_URI; // Declare MONGO_URI in your .env file
-    const client = new MongoClient(URI);
+async function myDB(callback) {
+  const client = new MongoClient(process.env.MONGO_URI);
 
-    async function checkDBConnection() {
-        try {
-            await client.connect(); // Povezivanje na MongoDB
-            console.log('Uspesna konekcija sa bazom!');
-            await client.close(); // Zatvori konekciju nakon provere
-        } catch (err) {
-            console.error('Greška prilikom povezivanja sa bazom:', err);
-        }
-    }
-
-    // Pozivanje funkcije za proveru konekcije
-    await checkDBConnection();
-
-    try {
-        // Connect to the MongoDB cluster
-        await client.connect();
-
-        // Make the appropriate DB calls
-        await callback(client);
-
-    } catch (e) {
-        // Catch any errors
-        console.error(e);
-        throw new Error('Unable to Connect to Database');
-    }
+  try {
+    // Connect to the MongoDB cluster
+    await client.connect();
+    console.log('Successfully connected to MongoDB');
+    await callback(client); // Call the function with the connected client
+  } catch (err) {
+    console.error('Error connecting to MongoDB:', err);
+    throw err; // Re-throw the error to handle it in server.js
+  }
 }
 
-module.exports = main;
+module.exports = myDB;
